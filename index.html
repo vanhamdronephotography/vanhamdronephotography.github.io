@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanham Drone Photography</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('DJI_20241006172027_0054_D.JPG') no-repeat center center/cover;
+            background-attachment: fixed;
+            color: white;
+            text-align: center;
+        }
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px 0;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 18px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+        th {
+            background: #444;
+            color: #fff;
+        }
+        td {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        tr:hover {
+            cursor: pointer;
+        }
+        .selected-package {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ccc;
+            font-size: 16px;
+        }
+        p {
+            font-size: 18px;
+        }
+        .payment-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .note {
+            font-size: 16px;
+            color: #ffdd57;
+            margin-top: 10px;
+        }
+        .total {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffdd57;
+        }
+        .social-media {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-media img {
+            width: 40px;
+            height: 40px;
+        }
+        .flythrough-section input,
+        .video-section input {
+            width: 60px;
+            text-align: center;
+        }
+        .input-box {
+            width: 100px;
+            padding: 5px;
+            text-align: center;
+            margin: 5px;
+        }
+        .image-gallery img {
+            width: 100%;
+            height: auto;
+            margin: 10px;
+        }
+        .view-work-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #ffdd57;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .view-work-btn:hover {
+            background-color: #ffcc00;
+            transform: scale(1.05);
+        }
+        .view-work-btn:focus {
+            outline: none;
+        }
+
+        /* Add this for the yellow text */
+        .yellow-text {
+            color: #ffdd57;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Include jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <header>Vanham Drone Photography</header>
+    <div class="container">
+        <h2>Pricing Packages</h2>
+        <form id="orderForm">
+            <table>
+                <tr>
+                    <th>Package</th>
+                    <th>Details</th>
+                    <th>Price</th>
+                </tr>
+                <tr onclick="selectPackage(95)">
+                    <td>
+                        <input type="radio" name="package" value="95" id="package95" class="package-radio" hidden>
+                        Package 1
+                    </td>
+                    <td>0-20 pictures</td>
+                    <td>$95</td>
+                </tr>
+                <tr onclick="selectPackage(110)">
+                    <td>
+                        <input type="radio" name="package" value="110" id="package110" class="package-radio" hidden>
+                        Package 2
+                    </td>
+                    <td>25-30 pictures</td>
+                    <td>$110</td>
+                </tr>
+                <tr onclick="selectPackage(130)">
+                    <td>
+                        <input type="radio" name="package" value="130" id="package130" class="package-radio" hidden>
+                        Package 3
+                    </td>
+                    <td>35-40 pictures</td>
+                    <td>$130</td>
+                </tr>
+                <tr onclick="selectPackage(150)">
+                    <td>
+                        <input type="radio" name="package" value="150" id="package150" class="package-radio" hidden>
+                        Package 4
+                    </td>
+                    <td>45-50 pictures</td>
+                    <td>$150</td>
+                </tr>
+                <tr onclick="selectPackage(200)">
+                    <td>
+                        <input type="radio" name="package" value="200" id="package200" class="package-radio" hidden>
+                        Package 5
+                    </td>
+                    <td>Above 50 pictures</td>
+                    <td>$200</td>
+                </tr>
+                <tr onclick="selectPackage(100)">
+                    <td>
+                        <input type="radio" name="package" value="100" id="package100" class="package-radio" hidden>
+                        Package 6
+                    </td>
+                    <td>House Flythrough (Only)</td>
+                    <td>$100</td>
+                </tr>
+            </table>
+
+            <p><strong>House Flythrough:</strong> $80 with the purchase of package (1-5)</p>
+            <div class="flythrough-section">
+                <label for="flythrough">Flythrough:</label>
+                <input type="checkbox" id="flythrough" onclick="updateTotal(); enableOptions()"> <br>
+            </div>
+
+            <h2>Video Packages</h2>
+            <p class="note">Note: Video packages are available only as add-ons to a photography package. They cannot be purchased as standalone services.</p>
+            <div class="video-section">
+                <label for="video30">30-second videos ($25 each):</label>
+                <input type="number" id="video30" class="input-box" value="0" min="0" onchange="updateTotal()" disabled> <br>
+                <label for="video60">1-minute videos ($45 each):</label>
+                <input type="number" id="video60" class="input-box" value="0" min="0" onchange="updateTotal()" disabled> <br>
+                <label for="video90">1.5-minute videos ($70 each):</label>
+                <input type="number" id="video90" class="input-box" value="0" min="0" onchange="updateTotal()" disabled> <br>
+            </div>
+        </form>
+
+        <div class="total">
+            Total: $<span id="totalAmount">0</span>
+        </div>
+
+        <!-- Payment Options Section Restored -->
+        <h2>Payment Options</h2>
+        <p>Cash | Check | <a href="https://cash.app/$CodyAbraham10" class="payment-links">CashApp</a> | <a href="https://account.venmo.com/u/codyabraham" class="payment-links">Venmo</a></p>
+
+        <!-- Download Receipt Button -->
+        <button id="downloadReceiptBtn" onclick="downloadReceipt()" disabled>Download Receipt</button>
+
+        <!-- Message to send receipt to email -->
+        <p class="note">After downloading your receipt, please send a copy to <strong>vanhamdronephotography@gmail.com</strong> for confirmation.</p>
+
+        <!-- Instagram and YouTube Icons and Links -->
+        <div class="social-media">
+            <a href="https://www.instagram.com/vanhamdronephotography" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" alt="Instagram Logo">
+            </a>
+            <a href="https://www.youtube.com/@vanhamdronephotography" target="_blank">
+                <img src="Youtube.png" alt="YouTube Logo">
+            </a>
+        </div>
+
+        <!-- Button to open previous works in another tab -->
+        <p class="yellow-text">Click the button below to view our previous drone photography work!</p>
+        <button class="view-work-btn" onclick="window.open('gallery.html', '_blank')">View Our Previous Work</button>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Disable flythrough checkbox by default when page loads
+            document.getElementById('flythrough').disabled = true;
+        };
+
+        function enableOptions() {
+            const packageSelected = document.querySelector('input[name="package"]:checked');
+            const videoInputs = document.querySelectorAll('.video-section input');
+            const flythroughCheckbox = document.getElementById('flythrough');
+            const downloadButton = document.getElementById('downloadReceiptBtn');
+
+            // Enable/Disable flythrough based on package selection (only Package 1-5)
+            const package6Selected = document.getElementById('package100').checked;
+            if (package6Selected) {
+                flythroughCheckbox.disabled = true;
+                flythroughCheckbox.checked = false;
+            } else {
+                flythroughCheckbox.disabled = !packageSelected || package6Selected;
+            }
+
+            // Enable/Disable video inputs based on package selection
+            if (packageSelected) {
+                videoInputs.forEach(input => input.disabled = false);
+                downloadButton.disabled = false;  // Enable the download button
+            } else {
+                videoInputs.forEach(input => input.disabled = true);
+                flythroughCheckbox.disabled = true;
+                flythroughCheckbox.checked = false;
+                downloadButton.disabled = true;  // Disable the download button if no package is selected
+            }
+        }
+
+        function updateTotal() {
+            let total = 0;
+
+            // Calculate selected package
+            const package = document.querySelector('input[name="package"]:checked');
+            if (package) {
+                total += parseFloat(package.value);
+            }
+
+            // Add flythrough fee if selected
+            const flythrough = document.getElementById('flythrough').checked;
+            if (flythrough) {
+                total += 80; // Flythrough cost with a package
+            }
+
+            // Add video costs if selected
+            const video30 = document.getElementById('video30').value;
+            const video60 = document.getElementById('video60').value;
+            const video90 = document.getElementById('video90').value;
+            total += (video30 * 25) + (video60 * 45) + (video90 * 70);
+
+            // Format total with commas
+            document.getElementById('totalAmount').textContent = total.toLocaleString();
+        }
+
+        function selectPackage(value) {
+            document.querySelectorAll('input[name="package"]').forEach((el) => {
+                if (el.value == value) {
+                    el.checked = true;
+                }
+            });
+            enableOptions();
+            updateTotal();
+        }
+        
+        // Download receipt function (for now just console log)
+        function downloadReceipt() {
+            const doc = new jsPDF();
+            doc.text('Receipt for Vanham Drone Photography', 10, 10);
+            doc.text('Thank you for your purchase!', 10, 20);
+            doc.save('receipt.pdf');
+        }
+    </script>
+</body>
+</html>
