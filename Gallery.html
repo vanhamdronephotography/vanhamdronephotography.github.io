@@ -96,10 +96,33 @@
         .prev:hover, .next:hover {
             background-color: rgba(0, 0, 0, 0.8);
         }
+        /* Back to home button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #ffdd57;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #ffcc00;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
     <header>Vanham Drone Photography - Gallery</header>
+    
+    <!-- Back button to return to previous page -->
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    
     <div class="gallery">
         <img src="DJI_0154.JPG" alt="Previous Work 1" class="gallery-item">
         <img src="DJI_0161.JPG" alt="Previous Work 2" class="gallery-item">
@@ -116,9 +139,9 @@
         <img src="DJI_20250118162303_0223_D.JPG" alt="Previous Work 13" class="gallery-item">
         <img src="DJI_20250208123557_0231_D.JPG" alt="Previous Work 14" class="gallery-item">
         <img src="DJI_20250208125513_0233_D.JPG" alt="Previous Work 15" class="gallery-item">
-	<img src="DJI_0028.JPG" alt="Previous Work 16" class="gallery-item">
-	<img src="DJI_0029.JPG" alt="Previous Work 17" class="gallery-item">
-	<img src="DJI_0031.JPG" alt="Previous Work 18" class="gallery-item">
+        <img src="DJI_0028.JPG" alt="Previous Work 16" class="gallery-item">
+        <img src="DJI_0029.JPG" alt="Previous Work 17" class="gallery-item">
+        <img src="DJI_0031.JPG" alt="Previous Work 18" class="gallery-item">
     </div>
 
     <!-- Modal for enlarged images -->
@@ -168,6 +191,11 @@
             if (event.target === modal) {
                 closeModal();
             }
+        }
+        
+        // Function to go back to previous page
+        function goBack() {
+            window.history.back();
         }
     </script>
 </body>
