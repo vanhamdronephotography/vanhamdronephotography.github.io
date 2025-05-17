@@ -141,7 +141,7 @@
             height: auto;
             margin: 10px;
         }
-        .view-work-btn, #downloadReceiptBtn, .home-btn {
+        .view-work-btn, #downloadReceiptBtn, .home-btn, #submitOrderBtn {
             padding: 15px 30px;
             font-size: 18px;
             background-color: #ffdd57;
@@ -154,11 +154,11 @@
             letter-spacing: 1px;
             margin: 10px;
         }
-        .view-work-btn:hover, #downloadReceiptBtn:hover, .home-btn:hover {
+        .view-work-btn:hover, #downloadReceiptBtn:hover, .home-btn:hover, #submitOrderBtn:hover {
             background-color: #ffcc00;
             transform: scale(1.05);
         }
-        .view-work-btn:focus, #downloadReceiptBtn:focus, .home-btn:focus {
+        .view-work-btn:focus, #downloadReceiptBtn:focus, .home-btn:focus, #submitOrderBtn:focus {
             outline: none;
         }
         .yellow-text {
@@ -172,7 +172,7 @@
             margin-top: 20px;
             flex-wrap: wrap;
         }
-        #downloadReceiptBtn:disabled {
+        #downloadReceiptBtn:disabled, #submitOrderBtn:disabled {
             background-color: #999;
             transform: none;
             cursor: not-allowed;
@@ -234,6 +234,53 @@
             margin-top: 15px;
             border-top: 2px solid #333;
             padding-top: 10px;
+        }
+        /* Add styles for success message */
+        .success-message {
+            background-color: rgba(0, 128, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        /* Add styles for customer info form */
+        .customer-info {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .form-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ffdd57;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+        .form-group select {
+            height: 42px;
+        }
+.form-group select option {
+    color: #ffdd57;
+    background: #000; /* optional for dark theme consistency */
+}
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ffcc00;
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
     <!-- Include jsPDF Library -->
@@ -326,10 +373,48 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Add customer information section -->
+            <div class="customer-info" id="customerInfo">
+                <h2>Customer Information</h2>
+                <div class="form-group">
+    <label for="customerName">Name:</label>
+    <input type="text" id="customerName" required oninput="validateCustomerInfo()">
+</div>
+<div class="form-group">
+    <label for="customerEmail">Email:</label>
+    <input type="email" id="customerEmail" required oninput="validateCustomerInfo()">
+</div>
+<div class="form-group">
+    <label for="customerPhone">Phone:</label>
+    <input type="tel" id="customerPhone" required oninput="validateCustomerInfo()">
+</div>
+<div class="form-group">
+    <label for="propertyAddress">Property Address:</label>
+    <textarea id="propertyAddress" rows="3" required oninput="validateCustomerInfo()"></textarea>
+</div>
+<div class="form-group">
+    <label for="paymentMethod">Payment Method:</label>
+    <select id="paymentMethod" required onchange="validateCustomerInfo()">
+        <option value="">-- Select Payment Method --</option>
+        <option value="Cash">Cash</option>
+        <option value="Check">Check</option>
+        <option value="CashApp">CashApp</option>
+        <option value="Venmo">Venmo</option>
+    </select>
+</div>
+
+            </div>
         </form>
 
         <div class="total">
             Total: $<span id="totalAmount">0</span>
+        </div>
+
+        <!-- Success message -->
+        <div class="success-message" id="successMessage">
+            <h3>Thank you for your order!</h3>
+            <p>Your order has been submitted successfully. We'll contact you soon to schedule your drone photography session.</p>
         </div>
 
         <!-- Receipt Preview Section -->
@@ -371,11 +456,11 @@
             <p class="payment-links">Cash | Check | <a href="https://cash.app/$CodyAbraham10" target="_blank">CashApp</a> | <a href="https://account.venmo.com/u/codyabraham" target="_blank">Venmo</a></p>
         </div>
 
+        <!-- Order Submission Button -->
+        <button id="submitOrderBtn" onclick="submitOrder()" disabled>Submit Order</button>
+
         <!-- Download Receipt Button -->
         <button id="downloadReceiptBtn" onclick="downloadReceipt()" disabled>Download Receipt</button>
-
-        <!-- Message to send receipt to email -->
-        <p class="note">After downloading your receipt, please send a copy to <strong>vanhamdronephotography@gmail.com</strong> for confirmation.</p>
 
         <!-- Navigation Buttons -->
         <div class="button-container">
@@ -397,7 +482,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         window.onload = function() {
             // Disable flythrough checkbox by default when page loads
             document.getElementById('flythrough').disabled = true;
@@ -410,32 +495,54 @@
             document.getElementById('receiptPreview').style.display = 'block';
         };
 
-        function enableOptions() {
-            const packageSelected = document.querySelector('input[name="package"]:checked');
-            const videoInputs = document.querySelectorAll('.video-section input');
-            const flythroughCheckbox = document.getElementById('flythrough');
-            const downloadButton = document.getElementById('downloadReceiptBtn');
+        // New validation function to check all customer info fields
+function validateCustomerInfo() {
+    const customerName = document.getElementById('customerName').value.trim();
+    const customerEmail = document.getElementById('customerEmail').value.trim();
+    const customerPhone = document.getElementById('customerPhone').value.trim();
+    const propertyAddress = document.getElementById('propertyAddress').value.trim();
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    // Package selection is validated separately in enableOptions
+    const packageSelected = document.querySelector('input[name="package"]:checked');
+    
+    // Check if all customer fields are filled AND a package is selected
+    const allFieldsFilled = customerName && customerEmail && customerPhone && 
+                           propertyAddress && paymentMethod && packageSelected;
+    
+    // Update button states
+    document.getElementById('downloadReceiptBtn').disabled = !allFieldsFilled;
+    document.getElementById('submitOrderBtn').disabled = !allFieldsFilled;
+}
 
-            // Enable/Disable flythrough based on package selection (only Package 1-5)
-            const package6Selected = document.getElementById('package100').checked;
-            if (package6Selected) {
-                flythroughCheckbox.disabled = true;
-                flythroughCheckbox.checked = false;
-            } else {
-                flythroughCheckbox.disabled = !packageSelected || package6Selected;
-            }
+// Modified enableOptions function to include customer validation
+function enableOptions() {
+    const packageSelected = document.querySelector('input[name="package"]:checked');
+    const videoInputs = document.querySelectorAll('.video-section input');
+    const flythroughCheckbox = document.getElementById('flythrough');
+    
+    if (!packageSelected) {
+        // no package picked → disable everything
+        videoInputs.forEach(i => { i.disabled = true; i.value = 0; });
+        flythroughCheckbox.disabled = true;
+        flythroughCheckbox.checked = false;
+        document.getElementById('downloadReceiptBtn').disabled = true;
+        document.getElementById('submitOrderBtn').disabled = true;
+        return;
+    }
+    
+    // flythrough only for packages 1–5
+    const isFlyOnly = (packageSelected.value === "100");
+    flythroughCheckbox.disabled = isFlyOnly;
+    if (isFlyOnly) flythroughCheckbox.checked = false;
+    
+    // always enable video counts
+    videoInputs.forEach(i => i.disabled = false);
+    
+    // Now check customer info to determine button states
+    validateCustomerInfo();
+}
 
-            // Enable/Disable video inputs based on package selection
-            if (packageSelected) {
-                videoInputs.forEach(input => input.disabled = false);
-                downloadButton.disabled = false;  // Enable the download button
-            } else {
-                videoInputs.forEach(input => input.disabled = true);
-                flythroughCheckbox.disabled = true;
-                flythroughCheckbox.checked = false;
-                downloadButton.disabled = true;  // Disable the download button if no package is selected
-            }
-        }
 
         function updateTotal() {
             let total = 0;
@@ -575,6 +682,105 @@
             // Show receipt preview
             document.getElementById('receiptPreview').style.display = 'block';
         }
+
+function validateCustomerInfo() {
+    const customerName = document.getElementById('customerName').value.trim();
+    const customerEmail = document.getElementById('customerEmail').value.trim();
+    const customerPhone = document.getElementById('customerPhone').value.trim();
+    const propertyAddress = document.getElementById('propertyAddress').value.trim();
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    // Package selection is validated separately in enableOptions
+    const packageSelected = document.querySelector('input[name="package"]:checked');
+    
+    // Check if all customer fields are filled AND a package is selected
+    const allFieldsFilled = customerName && customerEmail && customerPhone && 
+                           propertyAddress && paymentMethod && packageSelected;
+    
+    // Update button states
+    document.getElementById('downloadReceiptBtn').disabled = !allFieldsFilled;
+    document.getElementById('submitOrderBtn').disabled = !allFieldsFilled;
+}
+
+function submitOrder() {
+            // Get customer information
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const propertyAddress = document.getElementById('propertyAddress').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            
+            // Validate form
+            if (!customerName || !customerEmail || !customerPhone || !propertyAddress || !paymentMethod) {
+                alert('Please fill out all customer information fields');
+                return;
+            }
+            
+            // Get order information
+            const package = document.querySelector('input[name="package"]:checked');
+            if (!package) {
+                alert('Please select a package');
+                return;
+            }
+            
+            let packageName = "";
+            switch (package.value) {
+                case "95": packageName = "Package 1 (0-20 pictures)"; break;
+                case "110": packageName = "Package 2 (25-30 pictures)"; break;
+                case "130": packageName = "Package 3 (35-40 pictures)"; break;
+                case "150": packageName = "Package 4 (45-50 pictures)"; break;
+                case "200": packageName = "Package 5 (Above 50 pictures)"; break;
+                case "100": packageName = "Package 6 (House Flythrough Only)"; break;
+            }
+            
+            const flythrough = document.getElementById('flythrough').checked;
+            const video30 = parseInt(document.getElementById('video30').value);
+            const video60 = parseInt(document.getElementById('video60').value);
+            const video90 = parseInt(document.getElementById('video90').value);
+            const totalAmount = document.getElementById('totalAmount').textContent;
+            
+            // Create order data object
+            const orderData = {
+                timestamp: new Date().toISOString(),
+                customerName: customerName,
+                customerEmail: customerEmail,
+                customerPhone: customerPhone,
+                propertyAddress: propertyAddress,
+                paymentMethod: paymentMethod,
+                package: packageName,
+                packagePrice: package.value,
+                flythrough: flythrough ? "Yes" : "No",
+                video30: video30,
+                video60: video60,
+                video90: video90,
+                totalAmount: totalAmount
+            };
+            
+            // Send data to your Google Sheets via Google Apps Script
+            fetch('https://script.google.com/macros/s/AKfycbwKjGSZGpxUZc3o4kz0_sBXE1mZPNgwKexGTjoXWtdzlVZNJYLOzCdEyG7jhNsjnnC6Ug/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            })
+            .then(() => {
+                // Show success message
+                document.getElementById('successMessage').style.display = 'block';
+                
+                // Download the receipt
+                downloadReceipt();
+                
+                // Disable submit button to prevent duplicate submissions
+                document.getElementById('submitOrderBtn').disabled = true;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your order. Please try again or contact us directly.');
+            });
+        }
+
         
         // Download receipt function
         function downloadReceipt() {
@@ -614,8 +820,9 @@
                 
                 doc.setFontSize(12);
                 doc.text('Selected Package: ' + packageName, 20, yPosition);
+yPosition += 10;
                 doc.text('Package Price: $' + package.value, 150, yPosition, { align: 'right' });
-                yPosition += 10;
+                
             }
             
             // Add flythrough if selected
@@ -661,7 +868,6 @@
             doc.setFont('helvetica', 'normal');
             doc.text('Thank you for choosing Vanham Drone Photography!', 105, yPosition, { align: 'center' });
             yPosition += 10;
-            doc.text('Please send a copy of this receipt to vanhamdronephotography@gmail.com', 105, yPosition, { align: 'center' });
             
             // Save the PDF
             doc.save('vanham_drone_photography_receipt.pdf');
